@@ -2,26 +2,32 @@
 import { GoogleGenAI, Modality } from "@google/genai";
 
 export default async function handler(req, res) {
-  // 允许跨域
+  // 设置 CORS 头，允许前端访问
   res.setHeader('Access-Control-Allow-Credentials', true);
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  res.setHeader(
+    'Access-Control-Allow-Headers',
+    'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version'
+  );
 
+  // 处理预检请求
   if (req.method === 'OPTIONS') {
     res.status(200).end();
     return;
   }
 
+  // 检查 API Key
   const apiKey = process.env.API_KEY;
   if (!apiKey) {
-    return res.status(500).json({ error: "Server API_KEY missing in Vercel Settings" });
+    return res.status(500).json({ error: "Server API_KEY missing" });
   }
 
   try {
     const { type, text, voice } = req.body;
     const ai = new GoogleGenAI({ apiKey });
 
+    // === 场景 A: 语音合成 (TTS) ===
     if (type === 'tts') {
       const response = await ai.models.generateContent({
         model: "gemini-2.5-flash-preview-tts",
@@ -29,7 +35,9 @@ export default async function handler(req, res) {
         config: {
           responseModalities: [Modality.AUDIO],
           speechConfig: {
-            voiceConfig: { prebuiltVoiceConfig: { voiceName: voice || 'Kore' } },
+            voiceConfig: {
+              prebuiltVoiceConfig: { voiceName: voice || 'Kore' },
+            },
           },
         },
       });
@@ -37,18 +45,19 @@ export default async function handler(req, res) {
       return res.status(200).json({ audio: audioData });
     }
 
+    // === 场景 B: 单词解释 (Explain) ===
     if (type === 'explain') {
         const response = await ai.models.generateContent({
             model: "gemini-2.5-flash",
-            contents: `Explain "${text}" simply in English.`,
+            contents: `Explain the meaning of "${text}" simply in English under 40 words.`,
         });
         return res.status(200).json({ text: response.text });
     }
 
-    res.status(400).json({ error: "Invalid type" });
+    return res.status(400).json({ error: "Invalid request type" });
 
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: error.message });
+    console.error("Proxy Error:", error);
+    return res.status(500).json({ error: error.message });
   }
 }
