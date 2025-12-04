@@ -1,25 +1,26 @@
 import React, { useState } from 'react';
-import { COURSE_CONTENT } from './constants';
-import { Lock, Crown, KeyRound, Star, Map, Zap } from 'lucide-react';
+import { COURSE_CONTENT } from '../constants';
+import { Lock, Crown, KeyRound, Star, Map, Zap, Book, BrainCircuit, History } from 'lucide-react';
 
 interface DashboardProps {
-  onLessonSelect: (id: string) => void;
+  onLevelSelect: (id: string) => void;
+  onMistakeBook: () => void;
+  onAiChat: () => void;
   isPremium: boolean;
   onUnlock: () => void;
 }
 
-const Dashboard: React.FC<DashboardProps> = ({ onLessonSelect, isPremium, onUnlock }) => {
+const Dashboard: React.FC<DashboardProps> = ({ onLevelSelect, onMistakeBook, onAiChat, isPremium, onUnlock }) => {
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const [licenseKey, setLicenseKey] = useState('');
   const [error, setError] = useState('');
 
-  const handleLevelClick = (levelId: string, isLocked: boolean) => {
+  const handleLevelClick = (id: string, isLocked: boolean) => {
     if (isLocked) {
       setShowUpgradeModal(true);
       setError('');
-      setLicenseKey('');
     } else {
-      onLessonSelect(levelId);
+      onLevelSelect(id);
     }
   };
 
@@ -28,144 +29,123 @@ const Dashboard: React.FC<DashboardProps> = ({ onLessonSelect, isPremium, onUnlo
         onUnlock();
         setShowUpgradeModal(false);
     } else {
-        setError('Invalid license key. Try "ENGLISH2025"');
+        setError('Invalid code. Try "ENGLISH2025"');
     }
   };
 
   return (
-    <div className="min-h-screen pb-32 bg-[#F3F0FF]">
-      {/* Modern Header */}
-      <header className="sticky top-0 z-20 bg-white/80 backdrop-blur-md border-b border-indigo-100 px-6 py-4 flex justify-between items-center shadow-sm">
+    <div className="min-h-screen pb-32 bg-slate-50">
+      {/* Header */}
+      <header className="sticky top-0 z-20 bg-white/90 backdrop-blur-md border-b border-slate-200 px-6 py-4 flex justify-between items-center shadow-sm">
         <div className="flex items-center gap-2">
-            <div className="bg-indigo-600 p-1.5 rounded-lg">
+            <div className="bg-teal-600 p-1.5 rounded-lg">
                 <Map size={18} className="text-white" />
             </div>
-            <span className="font-extrabold text-slate-800 text-lg tracking-tight">Lumière</span>
+            <span className="font-extrabold text-slate-800 text-lg tracking-tight">Lumière English</span>
         </div>
         
         {isPremium ? (
-             <div className="flex items-center gap-1.5 bg-amber-100 px-3 py-1 rounded-full border border-amber-200 shadow-sm animate-pulse">
+             <div className="flex items-center gap-1.5 bg-amber-100 px-3 py-1 rounded-full border border-amber-200 shadow-sm">
                 <Crown size={14} className="text-amber-600 fill-amber-600" />
-                <span className="text-xs font-bold text-amber-700 uppercase tracking-wide">Pro</span>
+                <span className="text-xs font-bold text-amber-700 uppercase">Pro</span>
             </div>
         ) : (
             <button 
                 onClick={() => setShowUpgradeModal(true)}
-                className="flex items-center gap-1.5 bg-slate-900 text-white px-4 py-1.5 rounded-full text-xs font-bold hover:bg-slate-700 transition-colors shadow-lg shadow-slate-200"
+                className="flex items-center gap-1.5 bg-slate-900 text-white px-4 py-1.5 rounded-full text-xs font-bold hover:bg-slate-700 transition-colors"
             >
                 <Zap size={12} fill="currentColor" />
-                Upgrade
+                Unlock All
             </button>
         )}
       </header>
 
-      <div className="max-w-md mx-auto px-4 pt-8">
-        {/* Welcome Card */}
-        <div className="bg-white rounded-3xl p-6 shadow-xl shadow-indigo-100 mb-10 border border-white">
-            <h1 className="text-2xl font-extrabold text-slate-800 mb-1">Hello, Learner! 👋</h1>
-            <p className="text-slate-500 text-sm font-medium">Ready to continue your English journey?</p>
-            
-            <div className="mt-6 flex gap-3">
-                 <div className="flex-1 bg-indigo-50 rounded-2xl p-3 flex flex-col items-center justify-center border border-indigo-100">
-                    <span className="text-xl font-black text-indigo-600">Lvl {COURSE_CONTENT.length}</span>
-                    <span className="text-[10px] uppercase font-bold text-indigo-400">Target</span>
-                 </div>
-                 <div className="flex-1 bg-amber-50 rounded-2xl p-3 flex flex-col items-center justify-center border border-amber-100">
-                    <span className="text-xl font-black text-amber-600">0</span>
-                    <span className="text-[10px] uppercase font-bold text-amber-400">Streak</span>
-                 </div>
-            </div>
+      <div className="max-w-md mx-auto px-4 pt-6 space-y-6">
+        
+        {/* Quick Actions */}
+        <div className="grid grid-cols-2 gap-3">
+            <button 
+                onClick={onMistakeBook}
+                className="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex flex-col items-center justify-center gap-2 hover:border-red-200 hover:bg-red-50 transition-colors group"
+            >
+                <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center text-red-500 group-hover:scale-110 transition-transform">
+                    <History size={20} />
+                </div>
+                <span className="font-bold text-slate-700 text-sm">Mistake Book</span>
+            </button>
+            <button 
+                onClick={onAiChat}
+                className="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex flex-col items-center justify-center gap-2 hover:border-purple-200 hover:bg-purple-50 transition-colors group"
+            >
+                <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center text-purple-500 group-hover:scale-110 transition-transform">
+                    <BrainCircuit size={20} />
+                </div>
+                <span className="font-bold text-slate-700 text-sm">AI Tutor</span>
+            </button>
         </div>
 
-        {/* The Path UI */}
-        <div className="relative space-y-12">
-            {/* Central Line */}
-            <div className="absolute left-1/2 top-4 bottom-0 w-2 bg-slate-200 rounded-full -ml-1 -z-10"></div>
-
-            <div className="space-y-12">
-                {COURSE_CONTENT.map((level, idx) => {
-                        const isLocked = (level.isPremium && !isPremium);
-                        // Calculate offset to create zig-zag path effect
-                        const offsetClass = idx % 2 === 0 ? '-translate-x-12' : 'translate-x-12';
-                        
-                        return (
-                        <div key={level.id} className={`flex flex-col items-center transform ${offsetClass}`}>
-                            <button
-                                onClick={() => handleLevelClick(level.id, !!isLocked)}
-                                className={`
-                                    relative w-20 h-20 rounded-[2rem] flex items-center justify-center text-3xl shadow-[0_8px_0_rgba(0,0,0,0.15)] transition-all active:shadow-none active:translate-y-2
-                                    ${isLocked 
-                                        ? 'bg-slate-200 text-slate-400 cursor-not-allowed' 
-                                        : 'bg-white text-indigo-600 hover:ring-4 hover:ring-indigo-200 ring-offset-4'
-                                    }
-                                `}
-                            >
-                                <span className={isLocked ? 'opacity-20' : ''}>{level.icon}</span>
-                                {isLocked && (
-                                    <div className="absolute inset-0 flex items-center justify-center">
-                                        <div className="bg-slate-500 p-1.5 rounded-full text-white shadow-sm">
-                                            <Lock size={16} />
-                                        </div>
-                                    </div>
-                                )}
-                                {/* Stars decoration */}
-                                {!isLocked && <div className="absolute -top-1 -right-1 text-amber-400"><Star size={16} fill="currentColor" /></div>}
-                            </button>
-                            
-                            <div className="mt-3 text-center w-32 bg-white/90 backdrop-blur-sm px-2 py-1 rounded-xl shadow-sm">
-                                <span className="text-xs font-bold text-slate-700 leading-tight block">{level.title}</span>
-                                <span className="text-[10px] text-slate-400 block">{level.subTitle}</span>
+        {/* Course Levels */}
+        <div className="space-y-4">
+            <h2 className="text-lg font-black text-slate-800 px-1">Curriculum</h2>
+            {COURSE_CONTENT.map((level) => {
+                const isLocked = level.isPremium && !isPremium;
+                return (
+                    <button
+                        key={level.id}
+                        onClick={() => handleLevelClick(level.id, isLocked)}
+                        className={`w-full text-left p-5 rounded-3xl border transition-all relative overflow-hidden group ${
+                            isLocked 
+                            ? 'bg-slate-100 border-slate-200' 
+                            : 'bg-white border-slate-200 shadow-sm hover:shadow-md hover:border-teal-300'
+                        }`}
+                    >
+                        <div className="flex items-center gap-4 relative z-10">
+                            <div className={`w-14 h-14 rounded-2xl flex items-center justify-center text-2xl shadow-inner ${isLocked ? 'bg-slate-200 grayscale' : 'bg-teal-50'}`}>
+                                {level.icon}
+                            </div>
+                            <div className="flex-1">
+                                <div className="flex items-center justify-between mb-1">
+                                    <h3 className={`font-bold text-lg ${isLocked ? 'text-slate-500' : 'text-slate-800'}`}>{level.title}</h3>
+                                    {isLocked && <Lock size={16} className="text-slate-400" />}
+                                    {!isLocked && <div className="bg-teal-100 text-teal-700 text-[10px] font-bold px-2 py-0.5 rounded-full">OPEN</div>}
+                                </div>
+                                <p className="text-xs font-bold text-teal-600 uppercase tracking-wide mb-0.5">{level.subTitle}</p>
+                                <p className="text-xs text-slate-400 truncate">{level.description}</p>
                             </div>
                         </div>
-                        )
-                })}
-            </div>
+                    </button>
+                )
+            })}
         </div>
       </div>
 
-      {/* Upgrade Modal */}
+      {/* Unlock Modal */}
       {showUpgradeModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-md p-6 animate-fadeIn">
-            <div className="bg-white rounded-[2rem] p-6 w-full max-w-sm shadow-2xl relative overflow-hidden">
-                <div className="absolute top-0 left-0 w-full h-32 bg-gradient-to-br from-amber-300 to-orange-400 opacity-20 -z-0"></div>
-                
-                <button 
-                    onClick={() => setShowUpgradeModal(false)}
-                    className="absolute top-4 right-4 bg-slate-100 rounded-full p-2 text-slate-500 hover:bg-slate-200 z-10"
-                >
-                    ✕
-                </button>
-                
-                <div className="text-center pt-8 pb-6 relative z-10">
-                    <div className="w-20 h-20 bg-amber-100 rounded-3xl rotate-3 flex items-center justify-center mx-auto mb-4 shadow-lg border-4 border-white">
-                        <Crown size={40} className="text-amber-500" fill="currentColor" />
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 animate-fadeIn">
+             <div className="bg-white rounded-[2rem] p-6 w-full max-w-sm shadow-2xl relative">
+                <button onClick={() => setShowUpgradeModal(false)} className="absolute top-4 right-4 text-slate-400 hover:text-slate-600">✕</button>
+                <div className="text-center mb-6">
+                    <div className="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                        <Crown size={30} className="text-amber-500" />
                     </div>
-                    <h2 className="text-2xl font-extrabold text-slate-800 mb-2">Unlock Pro</h2>
-                    <p className="text-slate-500 text-sm px-4 font-medium">Get access to all levels including Business English.</p>
+                    <h2 className="text-xl font-black text-slate-800">Unlock All Levels</h2>
+                    <p className="text-slate-500 text-sm mt-1">Get full access to Advanced vocabulary, Business English, and AI features.</p>
                 </div>
-
-                <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100 mb-6 relative z-10">
-                    <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Access Code</label>
+                <div className="bg-slate-50 p-4 rounded-xl border border-slate-100 mb-4">
                     <div className="relative">
                         <KeyRound className="absolute left-3 top-3.5 text-slate-400" size={18} />
                         <input 
                             type="text" 
                             value={licenseKey}
                             onChange={(e) => setLicenseKey(e.target.value)}
-                            placeholder="Enter code (e.g. ENGLISH2025)"
-                            className="w-full pl-10 pr-4 py-3 bg-white border-2 border-slate-200 rounded-xl focus:outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 transition-all font-mono font-bold text-indigo-900"
+                            placeholder="Enter Code (ENGLISH2025)"
+                            className="w-full pl-10 pr-4 py-3 bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 font-mono text-sm"
                         />
                     </div>
-                    {error && <p className="text-rose-500 text-xs mt-2 font-bold flex items-center gap-1">⚠️ {error}</p>}
+                    {error && <p className="text-red-500 text-xs mt-2 font-bold">{error}</p>}
                 </div>
-
-                <button 
-                    onClick={verifyLicense}
-                    className="w-full bg-slate-900 text-white font-bold py-4 rounded-2xl shadow-xl shadow-slate-300 hover:scale-[1.02] active:scale-95 transition-all"
-                >
-                    Unlock Forever
-                </button>
-            </div>
+                <button onClick={verifyLicense} className="w-full bg-slate-900 text-white font-bold py-3.5 rounded-xl">Activate Premium</button>
+             </div>
         </div>
       )}
     </div>
